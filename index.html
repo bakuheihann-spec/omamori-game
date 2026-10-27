@@ -46,45 +46,44 @@ h1{font-size:clamp(27px,4.2vw,50px);margin:0;color:#702419;letter-spacing:.12em;
     <p id="resultText">この御守が、領主様の次なる征途に寄り添いますように。</p>
   </section>
   <div class="toolbar"><button type="button" class="secondary" id="resetResult">最初からやり直す</button></div>
-  <p class="legal">※ これはインタラクティブなテストページです。抽選結果は周年の祝福を表示するのみであり、正式な当選資格を意味するものではありません。実際のイベントルールは公式のお知らせをご確認ください。</p>
+  <p class="legal">※ これはインタラクティブなテストページです。抽選結果は周年の祝福を表示するのみであり、正式な当選資格を意味するものではありません。</p>
 </main>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalName" aria-hidden="true">
+<div class="modal" id="modal">
   <div class="modal-panel" id="modalPanel">
-    <button class="close" type="button" id="closeModal" aria-label="閉じる">×</button>
+    <button class="close" id="closeModal">×</button>
     <div class="modal-label" id="modalLabel">✦ おめでとうございます ✦</div>
     <h2 id="modalName">御守</h2>
-    <img class="modal-art" id="modalArt" alt="御守画像">
+    <img class="modal-art" id="modalArt">
     <p class="blessing" id="modalBlessing"></p>
     <div class="modal-actions"><button type="button" class="primary" id="again">もう一度引く</button></div>
   </div>
 </div>
 
 <script>
-// 这里使用了公开图片 CDN，完全不用带本地图片，任何人打开都能加载出来
-const cardBackSrc = "https://i.ibb.co/3kRmC8z/back.jpg"; 
+// ✅ 这里我已经完全按照你截图里的文件名改好了，格式完全对应
+const cardBackSrc = "./back.png"; 
 
 const omamori = [
-  { "name": "登用御守", "bless": "登用の時に、心に念じる\nすべてに応えがありますように。", "src": "https://i.ibb.co/VvL0Z7w/1.jpg", "weight": 24.5, "special": false },
-  { "name": "鍛造御守", "bless": "巧みに鍛えて器を成し、\nその鍛造のたびに\n得るものがありますように。", "src": "https://i.ibb.co/0jXqZ7v/2.jpg", "weight": 24.5, "special": false },
-  { "name": "開陣御守", "bless": "新たな旅路の出発が\n順調でありますように。\n行く先々で先機を\n得られますように。", "src": "https://i.ibb.co/8Y7zR7z/3.jpg", "weight": 24.5, "special": false },
-  { "name": "勝運御守", "bless": "陣に臨んで乱れず、\n肝心の戦いには勝機が\nありますように。", "src": "https://i.ibb.co/Vv9Fz7x/4.jpg", "weight": 24.5, "special": false },
-  { "name": "金色真戦御守", "bless": "伝うところによれば、心に期待を抱くだけですが、\nこの金色の光を見ることができるという。\n領主様の次の征途において、\n求めるものすべてを得、\n行く先々に悔いを残しませんように。", "src": "https://i.ibb.co/xL8Fz7y/5.jpg", "weight": 2, "special": true }
+  { "name": "登用御守", "bless": "登用の時に、心に念じる\nすべてに応えがありますように。", "src": "./1.jpg", "weight": 24.5, "special": false },
+  { "name": "鍛造御守", "bless": "巧みに鍛えて器を成し、\nその鍛造のたびに\n得るものがありますように。", "src": "./2.png", "weight": 24.5, "special": false },
+  { "name": "開陣御守", "bless": "新たな旅路の出発が\n順調でありますように。\n行く先々で先機を\n得られますように。", "src": "./3.png", "weight": 24.5, "special": false },
+  { "name": "勝運御守", "bless": "陣に臨んで乱れず、\n肝心の戦いには勝機が\nありますように。", "src": "./4.png", "weight": 24.5, "special": false },
+  { "name": "金色真戦御守", "bless": "伝うところによれば、心に期待を抱くだけですが、\nこの金色の光を見ることができるという。\n領主様の次の征途において、\n求めるものすべてを得、\n行く先々に悔いを残しませんように。", "src": "./5.png", "weight": 2, "special": true }
 ];
 
 const $ = id => document.getElementById(id);
 let locked = false;
-const deck = $('deck');
 
 function setup() {
   omamori.forEach((c,i)=>{
-    const button=document.createElement('button');
-    button.type='button';button.className='pick-card';
-    const art=document.createElement('img');
-    art.src=cardBackSrc; art.alt='御守（背面）';
-    button.append(art);
-    button.addEventListener('click',()=>draw());
-    deck.appendChild(button);
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'pick-card';
+    const img = document.createElement('img');
+    img.src = cardBackSrc;
+    btn.appendChild(img);
+    btn.addEventListener('click',()=>draw());
+    $('deck').appendChild(btn);
   });
 }
 
@@ -96,28 +95,32 @@ function weightedChoice(){
 
 function display(i){
   const c=omamori[i]; locked=false;
-  deck.classList.remove('shuffling'); $('drawButton').disabled=false;
+  $('deck').classList.remove('shuffling'); $('drawButton').disabled=false;
+  
   $('resultLabel').textContent=c.special?'✦ レア金色御守 ✦':'✦ 祈願結果 ✦';
   $('resultName').textContent=c.name; $('resultName').className=c.special?'special-name':'';
   $('resultText').textContent=c.bless;
+  
   $('modalName').textContent=c.name; $('modalName').className=c.special?'special-name':'';
-  $('modalArt').src=c.src; $('modalArt').alt=c.name; $('modalBlessing').textContent=c.bless;
+  $('modalArt').src=c.src; $('modalBlessing').textContent=c.bless;
   $('modalPanel').classList.toggle('gold',c.special);
   $('modalLabel').textContent=c.special?'✦ レア金色御守 ✦':'✦ おめでとうございます ✦';
-  $('modal').classList.add('active'); $('modal').setAttribute('aria-hidden','false'); $('closeModal').focus();
+  
+  $('modal').classList.add('active'); $('closeModal').focus();
+  
   const allCards = document.querySelectorAll('.pick-card img');
   allCards.forEach((img, idx) => { img.src = (idx === i) ? c.src : cardBackSrc; });
 }
 
-function draw(forced){
+function draw(){
   if(locked)return; locked=true; $('drawButton').disabled=true; closeResult();
   const allCards = document.querySelectorAll('.pick-card img');
   allCards.forEach(img => { img.src = cardBackSrc; });
-  deck.classList.add('shuffling');
-  setTimeout(()=>display(Number.isInteger(forced)?forced:weightedChoice()),560);
+  $('deck').classList.add('shuffling');
+  setTimeout(()=>display(weightedChoice()),560);
 }
 
-function closeResult(){ $('modal').classList.remove('active'); $('modal').setAttribute('aria-hidden','true'); }
+function closeResult(){ $('modal').classList.remove('active'); }
 
 $('drawButton').addEventListener('click',()=>draw());
 $('resetResult').addEventListener('click',()=>{
@@ -131,7 +134,6 @@ $('resetResult').addEventListener('click',()=>{
 $('again').addEventListener('click',()=>draw());
 $('closeModal').addEventListener('click',closeResult);
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeResult();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeResult();});
 setup();
 </script>
 </body>
